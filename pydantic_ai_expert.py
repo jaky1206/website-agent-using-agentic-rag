@@ -20,7 +20,7 @@ api_key=os.getenv("LLM_API_KEY")
 model = OpenAIModel(model_name=llm, api_key=api_key)
 pydantic_logfire_token = os.getenv('PYDANTIC_LOGFIRE_TOKEN')
 
-logfire.configure(send_to_logfire=pydantic_logfire_token)
+#logfire.configure(send_to_logfire=pydantic_logfire_token)
 
 @dataclass
 class PydanticAIDeps:
