@@ -37,7 +37,7 @@ supabase: Client = Client(
 pydantic_logfire_token = os.getenv('PYDANTIC_LOGFIRE_TOKEN')
 
 # Configure logfire to suppress warnings (optional)
-#logfire.configure(send_to_logfire='never')
+logfire.configure(send_to_logfire='never')
 
 class ChatMessage(TypedDict):
     """Format of messages sent to the browser/API."""

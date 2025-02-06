@@ -2,7 +2,7 @@
 create extension if not exists vector;
 
 -- Create the documentation chunks table
-create table site_pages (
+create table knowledge_base (
     id bigserial primary key,
     url varchar not null,
     chunk_number integer not null,
@@ -18,13 +18,13 @@ create table site_pages (
 );
 
 -- Create an index for better vector similarity search performance
-create index on site_pages using ivfflat (embedding vector_cosine_ops);
+create index on knowledge_base using ivfflat (embedding vector_cosine_ops);
 
 -- Create an index on metadata for faster filtering
-create index idx_site_pages_metadata on site_pages using gin (metadata);
+create index idx_knowledge_base_metadata on knowledge_base using gin (metadata);
 
 -- Create a function to search for documentation chunks
-create function match_site_pages (
+create function match_knowledge_base (
   query_embedding vector(1536),
   match_count int default 10,
   filter jsonb DEFAULT '{}'::jsonb
@@ -51,10 +51,10 @@ begin
     summary,
     content,
     metadata,
-    1 - (site_pages.embedding <=> query_embedding) as similarity
-  from site_pages
+    1 - (knowledge_base.embedding <=> query_embedding) as similarity
+  from knowledge_base
   where metadata @> filter
-  order by site_pages.embedding <=> query_embedding
+  order by knowledge_base.embedding <=> query_embedding
   limit match_count;
 end;
 $$;
@@ -62,11 +62,11 @@ $$;
 -- Everything above will work for any PostgreSQL database. The below commands are for Supabase security
 
 -- Enable RLS on the table
-alter table site_pages enable row level security;
+alter table knowledge_base enable row level security;
 
 -- Create a policy that allows anyone to read
 create policy "Allow public read access"
-  on site_pages
+  on knowledge_base
   for select
   to public
   using (true);

@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import asyncio
 import requests
@@ -23,6 +22,9 @@ supabase: Client = create_client(
     os.getenv("SUPABASE_PROJECT_URL"),
     os.getenv("SUPABASE_PROJECT_SERVICE_ROLE_SECRET")
 )
+scrape_target_name = os.getenv("SCRAP_TARGET_NAME");
+scrape_target_sitemap_url = os.getenv("SCRAP_TARGET_SITEMAP_URL");
+knowledge_base_name = os.getenv("KNOWLEDGE_BASE_NAME")
 
 @dataclass
 class ProcessedChunk:
@@ -89,7 +91,7 @@ async def get_title_and_summary(chunk: str, url: str) -> Dict[str, str]:
     
     try:
         response = await openai_client.chat.completions.create(
-            model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            model=llm_model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"URL: {url}\n\nContent:\n{chunk[:1000]}..."}  # Send first 1000 chars for context
@@ -102,7 +104,7 @@ async def get_title_and_summary(chunk: str, url: str) -> Dict[str, str]:
         return {"title": "Error processing title", "summary": "Error processing summary"}
 
 async def get_embedding(text: str) -> List[float]:
-    """Get embedding vector from OpenAI."""
+    """Get embedding vector from LLM."""
     try:
         response = await openai_client.embeddings.create(
             model="text-embedding-3-small",
@@ -123,7 +125,7 @@ async def process_chunk(chunk: str, chunk_number: int, url: str) -> ProcessedChu
     
     # Create metadata
     metadata = {
-        "source": "pydantic_ai_docs",
+        "source": scrape_target_name,
         "chunk_size": len(chunk),
         "crawled_at": datetime.now(timezone.utc).isoformat(),
         "url_path": urlparse(url).path
@@ -152,7 +154,7 @@ async def insert_chunk(chunk: ProcessedChunk):
             "embedding": chunk.embedding
         }
         
-        result = supabase.table("site_pages").insert(data).execute()
+        result = supabase.table(knowledge_base_name).insert(data).execute()
         print(f"Inserted chunk {chunk.chunk_number} for {chunk.url}")
         return result
     except Exception as e:
@@ -213,9 +215,9 @@ async def crawl_parallel(urls: List[str], max_concurrent: int = 5):
     finally:
         await crawler.close()
 
-def get_pydantic_ai_docs_urls() -> List[str]:
-    """Get URLs from Pydantic AI docs sitemap."""
-    sitemap_url = "https://ai.pydantic.dev/sitemap.xml"
+def get_document_urls() -> List[str]:
+    """Get URLs from sitemap."""
+    sitemap_url = scrape_target_sitemap_url
     try:
         response = requests.get(sitemap_url)
         response.raise_for_status()
@@ -224,7 +226,8 @@ def get_pydantic_ai_docs_urls() -> List[str]:
         root = ElementTree.fromstring(response.content)
         
         # Extract all URLs from the sitemap
-        namespace = {'ns': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+        # Detect actual namespace dynamically
+        namespace = {'ns': root.tag.split('}')[0].strip('{')}  # Extract from root tag
         urls = [loc.text for loc in root.findall('.//ns:loc', namespace)]
         
         return urls
@@ -233,8 +236,8 @@ def get_pydantic_ai_docs_urls() -> List[str]:
         return []
 
 async def main():
-    # Get URLs from Pydantic AI docs
-    urls = get_pydantic_ai_docs_urls()
+    # Get URLs docs
+    urls = get_document_urls()
     if not urls:
         print("No URLs found to crawl")
         return

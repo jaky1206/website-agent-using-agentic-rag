@@ -19,6 +19,7 @@ llm = os.getenv('LLM_API_MODEL')
 api_key=os.getenv("LLM_API_KEY")
 model = OpenAIModel(model_name=llm, api_key=api_key)
 pydantic_logfire_token = os.getenv('PYDANTIC_LOGFIRE_TOKEN')
+scrape_target_name = os.getenv("SCRAP_TARGET_NAME");
 
 #logfire.configure(send_to_logfire=pydantic_logfire_token)
 
@@ -28,8 +29,8 @@ class PydanticAIDeps:
     openai_client: AsyncOpenAI
 
 system_prompt = """
-You are an expert at Pydantic AI - a Python AI agent framework that you have access to all the documentation to,
-including examples, an API reference, and other resources to help you build Pydantic AI agents.
+You are an website agent - you have access to all the documentation related to the website,
+and other resources to help you answer questions based on the website.
 
 Your only job is to assist with this and you don't answer other questions besides describing what you are able to do.
 
@@ -49,7 +50,7 @@ pydantic_ai_expert = Agent(
 )
 
 async def get_embedding(text: str, openai_client: AsyncOpenAI) -> List[float]:
-    """Get embedding vector from OpenAI."""
+    """Get embedding vector."""
     try:
         response = await openai_client.embeddings.create(
             model="text-embedding-3-small",
@@ -78,11 +79,11 @@ async def retrieve_relevant_documentation(ctx: RunContext[PydanticAIDeps], user_
         
         # Query Supabase for relevant documents
         result = ctx.deps.supabase.rpc(
-            'match_site_pages',
+            'match_knowledge_base',
             {
                 'query_embedding': query_embedding,
                 'match_count': 5,
-                'filter': {'source': 'pydantic_ai_docs'}
+                'filter': {'source': scrape_target_name}
             }
         ).execute()
         
@@ -115,10 +116,10 @@ async def list_documentation_pages(ctx: RunContext[PydanticAIDeps]) -> List[str]
         List[str]: List of unique URLs for all documentation pages
     """
     try:
-        # Query Supabase for unique URLs where source is pydantic_ai_docs
-        result = ctx.deps.supabase.from_('site_pages') \
+        # Query Supabase for unique URLs where source is scrape_target_name
+        result = ctx.deps.supabase.from_('knowledge_base') \
             .select('url') \
-            .eq('metadata->>source', 'pydantic_ai_docs') \
+            .eq('metadata->>source', scrape_target_name) \
             .execute()
         
         if not result.data:
@@ -146,10 +147,10 @@ async def get_page_content(ctx: RunContext[PydanticAIDeps], url: str) -> str:
     """
     try:
         # Query Supabase for all chunks of this URL, ordered by chunk_number
-        result = ctx.deps.supabase.from_('site_pages') \
+        result = ctx.deps.supabase.from_('knowledge_base') \
             .select('title, content, chunk_number') \
             .eq('url', url) \
-            .eq('metadata->>source', 'pydantic_ai_docs') \
+            .eq('metadata->>source', scrape_target_name) \
             .order('chunk_number') \
             .execute()
         
