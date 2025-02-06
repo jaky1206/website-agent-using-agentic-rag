@@ -1,4 +1,4 @@
-# Chatbot With RAG Demo
+# Web site agent using agentic RAG and scraping 
 
 ## Overview  
 Inspired by Cole Medin's YouTube channel, this agent is designed to crawl documentation websites, store the content in a vector database, and deliver intelligent responses to user queries by retrieving and analyzing relevant sections of the documentation.
@@ -8,18 +8,20 @@ Inspired by Cole Medin's YouTube channel, this agent is designed to crawl docume
 - Supabase account and database
 - OpenAI API key
 - Streamlit (for web interface)
+- crawl4ai
+- Pydantic AI
 
 
 ## Conda Environment Setup
 
 ### Create a new conda environment
 ```shell
-conda create -n agentic_rag_demo
+conda create -n website_agent
 ```
 
 ### Activate the environment
 ```shell
-conda activate agentic_rag_demo
+conda activate website_agent
 ```
 
 ### Export configuration to a file
@@ -36,17 +38,17 @@ conda env create -f requirements.yml
 
 ### Create a new virtual environment
 ```shell
-python -m venv agentic_rag_demo
+python -m venv website_agent
 ```
 
 ### Activate the environment
 - On Windows:
   ```shell
-  agentic_rag_demo\Scripts\activate
+  website_agent\Scripts\activate
   ```
 - On macOS/Linux:
   ```shell
-  source agentic_rag_demo/bin/activate
+  source website_agent/bin/activate
   ```
 
 ### Install dependencies from a requirements file
