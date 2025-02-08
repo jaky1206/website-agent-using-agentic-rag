@@ -2,10 +2,8 @@ from __future__ import annotations as _annotations
 
 from dataclasses import dataclass
 from dotenv import load_dotenv
-import logfire
-import asyncio
-import httpx
 import os
+import logfire
 
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.openai import OpenAIModel
@@ -22,10 +20,11 @@ pydantic_logfire_token = os.getenv('PYDANTIC_LOGFIRE_TOKEN')
 scrape_target_name = os.getenv("SCRAP_TARGET_NAME");
 scrape_target_base_url = os.getenv("SCRAP_TARGET_BASE_URL");
 
-#logfire.configure(send_to_logfire=pydantic_logfire_token)
+# Configure logfire to suppress warnings (optional)
+logfire.configure(send_to_logfire='never')
 
 @dataclass
-class PydanticAIDeps:
+class WebsiteAgentDependencies:
     supabase: Client
     openai_client: AsyncOpenAI
 
@@ -60,10 +59,10 @@ You are the official embodiment of **{scrape_target_name}**, the business behind
 """
 
 
-pydantic_ai_expert = Agent(
+site_expert = Agent(
     model,
     system_prompt=system_prompt,
-    deps_type=PydanticAIDeps,
+    deps_type=WebsiteAgentDependencies,
     retries=2
 )
 
@@ -79,8 +78,8 @@ async def get_embedding(text: str, openai_client: AsyncOpenAI) -> List[float]:
         print(f"Error getting embedding: {e}")
         return [0] * 1536  # Return zero vector on error
 
-@pydantic_ai_expert.tool
-async def retrieve_relevant_documentation(ctx: RunContext[PydanticAIDeps], user_query: str) -> str:
+@site_expert.tool
+async def retrieve_relevant_documentation(ctx: RunContext[WebsiteAgentDependencies], user_query: str) -> str:
     """
     Retrieve relevant documentation chunks based on the query with RAG.
     
@@ -125,10 +124,10 @@ async def retrieve_relevant_documentation(ctx: RunContext[PydanticAIDeps], user_
         print(f"Error retrieving documentation: {e}")
         return f"Error retrieving documentation: {str(e)}"
 
-@pydantic_ai_expert.tool
-async def list_documentation_pages(ctx: RunContext[PydanticAIDeps]) -> List[str]:
+@site_expert.tool
+async def list_documentation_pages(ctx: RunContext[WebsiteAgentDependencies]) -> List[str]:
     """
-    Retrieve a list of all available Pydantic AI documentation pages.
+    Retrieve a list of all available documentation pages.
     
     Returns:
         List[str]: List of unique URLs for all documentation pages
@@ -151,8 +150,8 @@ async def list_documentation_pages(ctx: RunContext[PydanticAIDeps]) -> List[str]
         print(f"Error retrieving documentation pages: {e}")
         return []
 
-@pydantic_ai_expert.tool
-async def get_page_content(ctx: RunContext[PydanticAIDeps], url: str) -> str:
+@site_expert.tool
+async def get_page_content(ctx: RunContext[WebsiteAgentDependencies], url: str) -> str:
     """
     Retrieve the full content of a specific documentation page by combining all its chunks.
     

@@ -4,7 +4,6 @@ import asyncio
 import os
 
 import streamlit as st
-import json
 import logfire
 from supabase import Client
 from openai import AsyncOpenAI
@@ -22,7 +21,7 @@ from pydantic_ai.messages import (
     RetryPromptPart,
     ModelMessagesTypeAdapter
 )
-from pydantic_ai_expert import pydantic_ai_expert, PydanticAIDeps
+from website_agent import site_expert, WebsiteAgentDependencies
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -35,6 +34,7 @@ supabase: Client = Client(
 )
 
 pydantic_logfire_token = os.getenv('PYDANTIC_LOGFIRE_TOKEN')
+scrape_target_name = os.getenv("SCRAP_TARGET_NAME");
 
 # Configure logfire to suppress warnings (optional)
 logfire.configure(send_to_logfire='never')
@@ -73,13 +73,13 @@ async def run_agent_with_streaming(user_input: str):
     while maintaining the entire conversation in `st.session_state.messages`.
     """
     # Prepare dependencies
-    deps = PydanticAIDeps(
+    deps = WebsiteAgentDependencies(
         supabase=supabase,
         openai_client=openai_client
     )
 
     # Run the agent in a stream
-    async with pydantic_ai_expert.run_stream(
+    async with site_expert.run_stream(
         user_input,
         deps=deps,
         message_history= st.session_state.messages[:-1],  # pass entire conversation so far
@@ -107,8 +107,8 @@ async def run_agent_with_streaming(user_input: str):
 
 
 async def main():
-    st.title("Pydantic AI Agentic RAG")
-    st.write("Ask any question about Pydantic AI, the hidden truths of the beauty of this framework lie within.")
+    st.title(f"{scrape_target_name} ai agent")
+    st.write(f"Ask any question about {scrape_target_name}.")
 
     # Initialize chat history in session state if not present
     if "messages" not in st.session_state:
@@ -123,7 +123,7 @@ async def main():
                 display_message_part(part)
 
     # Chat input for the user
-    user_input = st.chat_input("What questions do you have about Pydantic AI?")
+    user_input = st.chat_input(f"What questions do you have about {scrape_target_name}?")
 
     if user_input:
         # We append a new request to the conversation explicitly
