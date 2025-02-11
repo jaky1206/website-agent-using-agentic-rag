@@ -4,6 +4,24 @@
 
 This project implements a website agent inspired by Cole Medin's YouTube channel. It consists of three main scripts:
 
+## Configuration
+
+To configure the application, you need to create a `.env` file in the root directory. You can use the `.env.example` file as a template.
+
+The following environment variables need to be configured:
+
+*   `LLM_API_PROVIDER`: The LLM API provider to use. Example: OpenAI
+*   `LLM_API_MODEL`: The LLM model to use. Example: gpt-4o-mini
+*   `LLM_API_KEY`: The API key for the LLM provider. Only needed if you are not using local models.
+*   `SUPABASE_PROJECT_URL`: The URL of your Supabase project.
+*   `SUPABASE_PROJECT_SERVICE_ROLE_SECRET`: The service role secret of your Supabase project.
+*   `SCRAP_TARGET_NAME`: The name of the target to scrape. Example: tourista
+*   `SCRAP_TARGET_SITEMAP_URL`: The URL of the sitemap to scrape. Example: https://tourista.co/sitemap.xml
+*   `SCRAP_TARGET_BASE_URL`: The base URL of the website to scrape. Example: https://tourista.co
+*   `PYDANTIC_LOGFIRE_TOKEN`: The token for Pydantic Logfire. (Not being used for now. Will be implemented later.)
+*   `KNOWLEDGE_BASE_NAME`: The name of the table. Example: knowledge_base
+
+
 *   `website_agent.py`: This script contains the core logic of the agent. It uses agentic RAG (Retrieval-Augmented Generation) to process user queries, retrieve relevant information from a vector database, and generate intelligent responses.
 *   `streamlit_ui.py`: This script creates a Streamlit-based web interface for interacting with the agent. It allows users to input queries and view the agent's responses in a user-friendly manner.
 *   `scrape_pages.py`: This script is responsible for crawling documentation websites and extracting content from specified websites. It stores the extracted content in a vector database for later retrieval by the agent.
