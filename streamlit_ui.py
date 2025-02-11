@@ -4,7 +4,6 @@ import asyncio
 import os
 
 import streamlit as st
-import logfire
 from supabase import Client
 from openai import AsyncOpenAI
 
@@ -33,11 +32,7 @@ supabase: Client = Client(
     os.getenv("SUPABASE_PROJECT_SERVICE_ROLE_SECRET")
 )
 
-pydantic_logfire_token = os.getenv('PYDANTIC_LOGFIRE_TOKEN')
 scrape_target_name = os.getenv("SCRAP_TARGET_NAME");
-
-# Configure logfire to suppress warnings (optional)
-logfire.configure(send_to_logfire='never')
 
 class ChatMessage(TypedDict):
     """Format of messages sent to the browser/API."""
