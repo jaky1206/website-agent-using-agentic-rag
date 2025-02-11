@@ -38,7 +38,6 @@ The following environment variables need to be configured:
 *   `SCRAP_TARGET_NAME`: The name of the target to scrape. Example: tourista
 *   `SCRAP_TARGET_SITEMAP_URL`: The URL of the sitemap to scrape. Example: https://tourista.co/sitemap.xml
 *   `SCRAP_TARGET_BASE_URL`: The base URL of the website to scrape. Example: https://tourista.co
-*   `PYDANTIC_LOGFIRE_TOKEN`: The token for Pydantic Logfire. (Not being used for now. Will be implemented later.)
 *   `KNOWLEDGE_BASE_NAME`: The name of the table. Example: knowledge_base
 
 

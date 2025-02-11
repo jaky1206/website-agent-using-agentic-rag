@@ -3,7 +3,6 @@ from __future__ import annotations as _annotations
 from dataclasses import dataclass
 from dotenv import load_dotenv
 import os
-import logfire
 
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.openai import OpenAIModel
@@ -16,12 +15,8 @@ load_dotenv()
 llm = os.getenv('LLM_API_MODEL')
 api_key=os.getenv("LLM_API_KEY")
 model = OpenAIModel(model_name=llm, api_key=api_key)
-pydantic_logfire_token = os.getenv('PYDANTIC_LOGFIRE_TOKEN')
-scrape_target_name = os.getenv("SCRAP_TARGET_NAME");
-scrape_target_base_url = os.getenv("SCRAP_TARGET_BASE_URL");
-
-# Configure logfire to suppress warnings (optional)
-logfire.configure(send_to_logfire='never')
+scrape_target_name = os.getenv("SCRAP_TARGET_NAME")
+scrape_target_base_url = os.getenv("SCRAP_TARGET_BASE_URL")
 
 @dataclass
 class WebsiteAgentDependencies:
