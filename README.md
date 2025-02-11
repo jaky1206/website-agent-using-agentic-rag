@@ -1,15 +1,28 @@
 # Web site agent using agentic RAG and scraping 
 
-## Overview  
-Inspired by Cole Medin's YouTube channel, this agent is designed to crawl documentation websites, store the content in a vector database, and deliver intelligent responses to user queries by retrieving and analyzing relevant sections of the documentation.
+## Overview
+
+This project implements a website agent inspired by Cole Medin's YouTube channel. It consists of three main scripts:
+
+*   `website_agent.py`: This script contains the core logic of the agent. It uses agentic RAG (Retrieval-Augmented Generation) to process user queries, retrieve relevant information from a vector database, and generate intelligent responses.
+*   `streamlit_ui.py`: This script creates a Streamlit-based web interface for interacting with the agent. It allows users to input queries and view the agent's responses in a user-friendly manner.
+*   `scrape_pages.py`: This script is responsible for crawling documentation websites and extracting content from specified websites. It stores the extracted content in a vector database for later retrieval by the agent.
+
+The agent works as follows:
+
+1.  The `scrape_pages.py` script crawls specified documentation websites and extracts their content.
+2.  The extracted content is stored in a vector database.
+3.  When a user enters a query through the Streamlit interface (`streamlit_ui.py`), the `website_agent.py` script retrieves relevant information from the vector database.
+4.  The agent uses the retrieved information to generate a response to the user's query.
 
 ## Prerequisites
-- Python 3.11+
-- Supabase account and database
-- OpenAI API key
-- Streamlit (for web interface)
-- crawl4ai
-- Pydantic AI
+
+*   Python 3.11+
+*   Supabase: Account and database
+*   OpenAI: API key
+*   Streamlit: For the web interface
+*   crawl4ai: For web scraping
+*   Pydantic AI: For data validation and AI models
 
 
 ## Conda Environment Setup
@@ -62,19 +75,23 @@ python -m venv website_agent
 ```shell
 pip freeze > requirements.txt
 ```
-for pip packages from a conda environment
-```
+for pip packages from a conda environment:
+
+```shell
 pip list --format=freeze > requirements.txt
 ```
 
 ### Create a new virtual environment and install dependencies from the `requirements.txt` file
-1. Create a new virtual environment as shown above.
-2. Activate the environment.
-3. Run:
-   ```shell
-   pip install -r requirements.txt
-   ```
+
+1.  Create a new virtual environment as shown above.
+2.  Activate the environment.
+3.  Run:
+
+```shell
+pip install -r requirements.txt
+```
 
 ## Acknowledgments
-- https://youtu.be/_R-ff4ZMLC8?si=A_DL_ugRg3o7nAHB
-- https://github.com/coleam00/ottomator-agents/tree/main/crawl4AI-agent
+
+*   [https://youtu.be/\_R-ff4ZMLC8?si=A\_DL\_ugRg3o7nAHB](https://youtu.be/_R-ff4ZMLC8?si=A_DL_ugRg3o7nAHB)
+*   [https://github.com/coleam00/ottomator-agents/tree/main/crawl4AI-agent](https://github.com/coleam00/ottomator-agents/tree/main/crawl4AI-agent)
