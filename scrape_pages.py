@@ -206,7 +206,7 @@ async def crawl_parallel(urls: List[str], max_concurrent: int = 5):
                 )
                 if result.success:
                     print(f"Successfully crawled: {url}")
-                    await process_and_store_document(url, result.markdown_v2.raw_markdown)
+                    await process_and_store_document(url, result.markdown.raw_markdown)
                 else:
                     print(f"Failed: {url} - Error: {result.error_message}")
         
